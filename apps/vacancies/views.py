@@ -1,0 +1,101 @@
+from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
+from django.db.models import F
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from apps.vacancies.filters import VacancyFilter
+from apps.vacancies.models import Vacancy
+from apps.vacancies.serializers import VacancyDetailSerializer, VacancyListSerializer
+
+
+class VacancyListView(generics.ListAPIView):
+    """
+    GET /api/v1/vacancies/
+    Returns paginated, filtered, searchable list of vacancies.
+    """
+
+    serializer_class = VacancyListSerializer
+    filterset_class = VacancyFilter
+    permission_classes = [AllowAny]
+    search_fields = ["title", "company_name", "description"]
+    ordering_fields = ["published_at", "salary_from", "created_at"]
+    ordering = ["-published_at"]
+
+    def get_queryset(self):
+        qs = (
+            Vacancy.objects.filter(is_deleted=False)
+            .select_related("source")
+            .only(
+                "id", "title", "company_name", "source",
+                "location_raw", "location_normalized",
+                "work_format", "experience_level", "employment_type",
+                "salary_from", "salary_to", "currency",
+                "skills", "url", "published_at",
+            )
+        )
+
+        # Full-text search using PostgreSQL SearchVector
+        q = self.request.query_params.get("q")
+        if q:
+            search_query = SearchQuery(q, config="russian")
+            qs = (
+                qs.annotate(rank=SearchRank(F("search_vector"), search_query))
+                .filter(search_vector=search_query)
+                .order_by("-rank")
+            )
+
+        return qs
+
+
+class VacancyDetailView(generics.RetrieveAPIView):
+    """
+    GET /api/v1/vacancies/{id}/
+    Returns full vacancy details including description and content.
+    """
+
+    serializer_class = VacancyDetailSerializer
+    permission_classes = [AllowAny]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return (
+            Vacancy.objects.filter(is_deleted=False)
+            .select_related("source", "content")
+        )
+
+
+class VacancyStatsView(APIView):
+    """
+    GET /api/v1/vacancies/stats/
+    Quick aggregate stats for dashboard.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from django.db.models import Count, Max
+
+        stats = Vacancy.objects.filter(is_deleted=False).aggregate(
+            total=Count("id"),
+            latest=Max("published_at"),
+        )
+        by_level = (
+            Vacancy.objects.filter(is_deleted=False)
+            .values("experience_level")
+            .annotate(count=Count("id"))
+        )
+        by_format = (
+            Vacancy.objects.filter(is_deleted=False)
+            .values("work_format")
+            .annotate(count=Count("id"))
+        )
+        return Response(
+            {
+                "total": stats["total"],
+                "latest_published_at": stats["latest"],
+                "by_experience_level": list(by_level),
+                "by_work_format": list(by_format),
+            }
+        )
