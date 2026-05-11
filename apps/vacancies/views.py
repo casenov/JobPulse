@@ -1,4 +1,3 @@
-from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
 from django.db.models import F
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
@@ -36,14 +35,15 @@ class VacancyListView(generics.ListAPIView):
             )
         )
 
-        # Full-text search using PostgreSQL SearchVector
+        # Search
         q = self.request.query_params.get("q")
         if q:
-            search_query = SearchQuery(q, config="russian")
-            qs = (
-                qs.annotate(rank=SearchRank(F("search_vector"), search_query))
-                .filter(search_vector=search_query)
-                .order_by("-rank")
+            # Fallback for SQLite (icontains) since SearchVector is Postgres-only
+            from django.db.models import Q
+            qs = qs.filter(
+                Q(title__icontains=q) | 
+                Q(company_name__icontains=q) | 
+                Q(description__icontains=q)
             )
 
         return qs

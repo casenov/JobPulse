@@ -8,5 +8,10 @@ MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE  #
 
 INTERNAL_IPS = ["127.0.0.1"]
 
-# Disable throttling in development
-REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []  # noqa
+# Disable security features that force HTTPS in development
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False

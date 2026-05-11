@@ -16,22 +16,19 @@ class UserFilter(TimestampedModel):
     name = models.CharField(max_length=255, default="Default Filter")
 
     # Keywords
-    keywords = ArrayField(
-        models.CharField(max_length=100),
+    keywords = models.JSONField(
         default=list,
         blank=True,
         help_text="Vacancy must match at least one keyword",
     )
-    excluded_keywords = ArrayField(
-        models.CharField(max_length=100),
+    excluded_keywords = models.JSONField(
         default=list,
         blank=True,
         help_text="Vacancy must NOT contain these keywords",
     )
 
     # Location
-    locations = ArrayField(
-        models.CharField(max_length=255),
+    locations = models.JSONField(
         default=list,
         blank=True,
         help_text="Acceptable locations (city, country)",

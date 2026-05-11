@@ -83,21 +83,21 @@ class Vacancy(TimestampedModel, SoftDeleteModel):
     url = models.URLField(max_length=2048, unique=True)
     published_at = models.DateTimeField(null=True, blank=True)
 
-    # FTS
-    search_vector = SearchVectorField(null=True, blank=True)
+    # FTS (Postgres only, disabled for SQLite)
+    # search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta:
         verbose_name = "Vacancy"
         verbose_name_plural = "Vacancies"
         ordering = ["-published_at"]
         indexes = [
-            GinIndex(fields=["search_vector"], name="vacancy_search_gin"),
+            # GinIndex(fields=["search_vector"], name="vacancy_search_gin"),
             models.Index(fields=["published_at"], name="vacancy_published_idx"),
             models.Index(fields=["source", "external_id"], name="vacancy_source_ext_idx"),
             models.Index(fields=["experience_level"], name="vacancy_level_idx"),
             models.Index(fields=["work_format"], name="vacancy_format_idx"),
             models.Index(fields=["salary_from", "salary_to"], name="vacancy_salary_idx"),
-            models.Index(fields=["is_deleted", "is_active"], name="vacancy_active_idx"),
+            models.Index(fields=["is_deleted"], name="vacancy_active_idx"),
         ]
         unique_together = [("source", "external_id")]
 

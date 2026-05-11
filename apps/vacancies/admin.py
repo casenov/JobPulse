@@ -19,7 +19,7 @@ class VacancyAdmin(admin.ModelAdmin):
         "source", "experience_level", "work_format", "employment_type", "is_deleted"
     ]
     search_fields = ["title", "company_name", "location_raw"]
-    readonly_fields = ["id", "created_at", "updated_at", "search_vector"]
+    readonly_fields = ["id", "created_at", "updated_at"]
     raw_id_fields = ["source"]
     ordering = ["-published_at"]
     date_hierarchy = "published_at"
@@ -42,6 +42,6 @@ class VacancyAdmin(admin.ModelAdmin):
             "fields": ("published_at", "created_at", "updated_at")
         }),
         ("State", {
-            "fields": ("is_deleted", "search_vector")
+            "fields": ("is_deleted",)
         }),
     )
