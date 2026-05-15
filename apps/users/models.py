@@ -39,8 +39,8 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     objects = UserManager()
 
     class Meta:
-        verbose_name = "User"
-        verbose_name_plural = "Users"
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -65,8 +65,8 @@ class TelegramProfile(TimestampedModel):
     last_active_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Telegram Profile"
-        verbose_name_plural = "Telegram Profiles"
+        verbose_name = "Профиль Telegram"
+        verbose_name_plural = "Профили Telegram"
 
     def __str__(self):
         return f"@{self.username or self.telegram_id}"

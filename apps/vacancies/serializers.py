@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 
 from apps.vacancies.models import Vacancy
 
@@ -7,7 +9,11 @@ class VacancyListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for list view — no heavy description field."""
 
     source_name = serializers.CharField(source="source.name", read_only=True)
-    salary_display = serializers.ReadOnlyField()
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_salary_display(self, obj):
+        return obj.salary_display
+
+    salary_display = serializers.SerializerMethodField()
 
     class Meta:
         model = Vacancy
@@ -24,7 +30,11 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
     """Full serializer for detail view — includes description and content."""
 
     source_name = serializers.CharField(source="source.name", read_only=True)
-    salary_display = serializers.ReadOnlyField()
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_salary_display(self, obj):
+        return obj.salary_display
+
+    salary_display = serializers.SerializerMethodField()
     full_text = serializers.SerializerMethodField()
 
     class Meta:
@@ -38,6 +48,7 @@ class VacancyDetailSerializer(serializers.ModelSerializer):
             "url", "published_at", "created_at",
         ]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_full_text(self, obj):
         if hasattr(obj, "content"):
             return obj.content.full_text

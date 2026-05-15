@@ -9,27 +9,27 @@ from core.mixins import SoftDeleteModel, TimestampedModel
 
 
 class EmploymentType(models.TextChoices):
-    FULL_TIME = "full_time", "Full-time"
-    PART_TIME = "part_time", "Part-time"
-    CONTRACT = "contract", "Contract"
-    FREELANCE = "freelance", "Freelance"
-    INTERNSHIP = "internship", "Internship"
+    FULL_TIME = "full_time", "Полная занятость"
+    PART_TIME = "part_time", "Частичная занятость"
+    CONTRACT = "contract", "Контракт"
+    FREELANCE = "freelance", "Фриланс"
+    INTERNSHIP = "internship", "Стажировка"
 
 
 class WorkFormat(models.TextChoices):
-    REMOTE = "remote", "Remote"
-    ONSITE = "onsite", "On-site"
-    HYBRID = "hybrid", "Hybrid"
-    NOT_SPECIFIED = "not_specified", "Not specified"
+    REMOTE = "remote", "Удаленно"
+    ONSITE = "onsite", "В офисе"
+    HYBRID = "hybrid", "Гибрид"
+    NOT_SPECIFIED = "not_specified", "Не указано"
 
 
 class ExperienceLevel(models.TextChoices):
-    INTERN = "intern", "Intern"
-    JUNIOR = "junior", "Junior"
-    MIDDLE = "middle", "Middle"
-    SENIOR = "senior", "Senior"
-    LEAD = "lead", "Lead"
-    NOT_SPECIFIED = "not_specified", "Not specified"
+    INTERN = "intern", "Стажер"
+    JUNIOR = "junior", "Младший (Junior)"
+    MIDDLE = "middle", "Средний (Middle)"
+    SENIOR = "senior", "Старший (Senior)"
+    LEAD = "lead", "Ведущий (Lead)"
+    NOT_SPECIFIED = "not_specified", "Не указано"
 
 
 class Vacancy(TimestampedModel, SoftDeleteModel):
@@ -87,8 +87,8 @@ class Vacancy(TimestampedModel, SoftDeleteModel):
     # search_vector = SearchVectorField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Vacancy"
-        verbose_name_plural = "Vacancies"
+        verbose_name = "Вакансия"
+        verbose_name_plural = "Вакансии"
         ordering = ["-published_at"]
         indexes = [
             # GinIndex(fields=["search_vector"], name="vacancy_search_gin"),
@@ -105,7 +105,7 @@ class Vacancy(TimestampedModel, SoftDeleteModel):
         return f"{self.title} @ {self.company_name}"
 
     @property
-    def salary_display(self):
+    def salary_display(self) -> str:
         if self.salary_from and self.salary_to:
             return f"{self.salary_from:,} – {self.salary_to:,} {self.currency}"
         if self.salary_from:

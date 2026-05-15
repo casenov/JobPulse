@@ -5,9 +5,9 @@ from core.mixins import TimestampedModel
 
 class SourceType(models.TextChoices):
     API = "api", "API"
-    SCRAPING = "scraping", "Web Scraping"
-    TELEGRAM = "telegram", "Telegram Channel"
-    RSS = "rss", "RSS Feed"
+    SCRAPING = "scraping", "Веб-парсинг"
+    TELEGRAM = "telegram", "Telegram-канал"
+    RSS = "rss", "RSS-лента"
 
 
 class Source(TimestampedModel):
@@ -33,8 +33,8 @@ class Source(TimestampedModel):
     last_parsed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Source"
-        verbose_name_plural = "Sources"
+        verbose_name = "Источник"
+        verbose_name_plural = "Источники"
         ordering = ["name"]
 
     def __str__(self):
@@ -42,10 +42,10 @@ class Source(TimestampedModel):
 
 
 class LogStatus(models.TextChoices):
-    STARTED = "started", "Started"
-    SUCCESS = "success", "Success"
-    FAILED = "failed", "Failed"
-    PARTIAL = "partial", "Partial"
+    STARTED = "started", "Запущено"
+    SUCCESS = "success", "Успешно"
+    FAILED = "failed", "Ошибка"
+    PARTIAL = "partial", "Частично"
 
 
 class ParsingLog(models.Model):
@@ -68,8 +68,8 @@ class ParsingLog(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
-        verbose_name = "Parsing Log"
-        verbose_name_plural = "Parsing Logs"
+        verbose_name = "Лог парсинга"
+        verbose_name_plural = "Логи парсинга"
         ordering = ["-started_at"]
         indexes = [
             models.Index(fields=["source", "started_at"], name="parselog_source_idx"),

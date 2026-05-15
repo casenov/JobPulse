@@ -27,3 +27,9 @@ sentry-sdk[django]>=1.40
 
 # Utils
 python-slugify>=8.0
+
+# Admin UI
+django-jazzmin>=3.0
+
+# Documentation (Swagger/Redoc)
+drf-spectacular>=0.27

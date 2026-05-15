@@ -3,6 +3,8 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import serializers
+from drf_spectacular.utils import extend_schema
 
 from apps.vacancies.filters import VacancyFilter
 from apps.vacancies.models import Vacancy
@@ -11,8 +13,7 @@ from apps.vacancies.serializers import VacancyDetailSerializer, VacancyListSeria
 
 class VacancyListView(generics.ListAPIView):
     """
-    GET /api/v1/vacancies/
-    Returns paginated, filtered, searchable list of vacancies.
+    Возвращает список вакансий с пагинацией, фильтрацией и поиском.
     """
 
     serializer_class = VacancyListSerializer
@@ -51,8 +52,7 @@ class VacancyListView(generics.ListAPIView):
 
 class VacancyDetailView(generics.RetrieveAPIView):
     """
-    GET /api/v1/vacancies/{id}/
-    Returns full vacancy details including description and content.
+    Возвращает полную информацию о вакансии, включая описание.
     """
 
     serializer_class = VacancyDetailSerializer
@@ -68,12 +68,12 @@ class VacancyDetailView(generics.RetrieveAPIView):
 
 class VacancyStatsView(APIView):
     """
-    GET /api/v1/vacancies/stats/
-    Quick aggregate stats for dashboard.
+    Агрегированная статистика для панели управления.
     """
 
     permission_classes = [AllowAny]
 
+    @extend_schema(responses={200: serializers.DictField()})
     def get(self, request):
         from django.db.models import Count, Max
 

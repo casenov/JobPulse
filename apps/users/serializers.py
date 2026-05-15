@@ -27,8 +27,8 @@ class TelegramRegisterSerializer(serializers.Serializer):
     Used by the Telegram bot to register/update a user.
     """
 
-    telegram_id = serializers.IntegerField()
-    username = serializers.CharField(required=False, allow_blank=True)
-    first_name = serializers.CharField(required=False, allow_blank=True)
-    last_name = serializers.CharField(required=False, allow_blank=True)
-    language_code = serializers.CharField(required=False, allow_blank=True)
+    telegram_id = serializers.IntegerField(help_text="ID пользователя в Telegram")
+    username = serializers.CharField(required=False, allow_blank=True, help_text="Имя пользователя (username)")
+    first_name = serializers.CharField(required=False, allow_blank=True, help_text="Имя")
+    last_name = serializers.CharField(required=False, allow_blank=True, help_text="Фамилия")
+    language_code = serializers.CharField(required=False, allow_blank=True, help_text="Код языка пользователя")

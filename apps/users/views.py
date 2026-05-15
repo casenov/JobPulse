@@ -1,8 +1,9 @@
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import generics, status, serializers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from drf_spectacular.utils import extend_schema
 
 from apps.users.models import TelegramProfile, User
 from apps.users.serializers import (
@@ -12,7 +13,7 @@ from apps.users.serializers import (
 
 
 class MeView(generics.RetrieveAPIView):
-    """GET /api/v1/users/me/ — current user profile."""
+    """Профиль текущего пользователя."""
 
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -23,13 +24,12 @@ class MeView(generics.RetrieveAPIView):
 
 class TelegramRegisterView(APIView):
     """
-    POST /api/v1/users/telegram/register/
-    Called by the Telegram bot when user sends /start.
-    Creates or updates the user + TelegramProfile.
+    Регистрация или обновление пользователя через Telegram (вызывается ботом при /start).
     """
 
     permission_classes = [AllowAny]
 
+    @extend_schema(request=TelegramRegisterSerializer, responses={200: UserSerializer, 201: UserSerializer})
     def post(self, request):
         serializer = TelegramRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -62,12 +62,15 @@ class TelegramRegisterView(APIView):
 
 class TelegramToggleNotificationsView(APIView):
     """
-    POST /api/v1/users/telegram/notifications/toggle/
-    Enables or disables notifications for the Telegram user.
+    Включение или выключение уведомлений для пользователя Telegram.
     """
 
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=serializers.DictField(), # Or just InlineSerializer if I had one
+        responses={200: serializers.DictField()}
+    )
     def post(self, request):
         telegram_id = request.data.get("telegram_id")
         if not telegram_id:

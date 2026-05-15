@@ -7,14 +7,15 @@ from apps.filters.serializers import UserFilterSerializer
 
 class UserFilterListCreateView(generics.ListCreateAPIView):
     """
-    GET  /api/v1/filters/   — list own filters
-    POST /api/v1/filters/   — create new filter
+    Список фильтров пользователя и создание новых фильтров.
     """
 
     serializer_class = UserFilterSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return UserFilter.objects.none()
         return UserFilter.objects.filter(user=self.request.user).order_by("-created_at")
 
     def perform_create(self, serializer):
@@ -23,10 +24,7 @@ class UserFilterListCreateView(generics.ListCreateAPIView):
 
 class UserFilterDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
-    GET    /api/v1/filters/{id}/ — retrieve
-    PUT    /api/v1/filters/{id}/ — full update
-    PATCH  /api/v1/filters/{id}/ — partial update
-    DELETE /api/v1/filters/{id}/ — delete
+    Просмотр, обновление и удаление конкретного фильтра пользователя.
     """
 
     serializer_class = UserFilterSerializer

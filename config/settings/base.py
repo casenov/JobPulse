@@ -4,6 +4,8 @@ JobScout Django settings — Base
 from pathlib import Path
 
 import environ
+from .jazzmin import JAZZMIN_SETTINGS, JAZZMIN_UI_TWEAKS
+
 
 # ─── Paths ────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -20,6 +22,10 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
+# ─── Jazzmin ──────────────────────────────────────────────────────────────────
+JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
+JAZZMIN_UI_TWEAKS = JAZZMIN_UI_TWEAKS
+
 # ─── Applications ─────────────────────────────────────────────────────────────
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -32,8 +38,10 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "jazzmin",  # Must be before admin
     "rest_framework",
     "django_filters",
+    "drf_spectacular",
 ]
 
 LOCAL_APPS = [
@@ -45,7 +53,7 @@ LOCAL_APPS = [
     "apps.notifications",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = ["jazzmin"] + DJANGO_APPS + [app for app in THIRD_PARTY_APPS if app != "jazzmin"] + LOCAL_APPS
 
 # ─── Middleware ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
@@ -130,6 +138,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",
@@ -227,4 +236,13 @@ LOGGING = {
             "propagate": False,
         },
     },
+}
+
+# --- Spectacular Settings (Docs) ----------------------------------------------
+SPECTACULAR_SETTINGS = {
+    "TITLE": "JobPulse API",
+    "DESCRIPTION": "API для отслеживания, парсинга и подбора вакансий.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_PATCH": True,
 }

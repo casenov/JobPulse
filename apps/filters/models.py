@@ -56,8 +56,8 @@ class UserFilter(TimestampedModel):
     notify_on_match = models.BooleanField(default=True)
 
     class Meta:
-        verbose_name = "User Filter"
-        verbose_name_plural = "User Filters"
+        verbose_name = "Фильтр пользователя"
+        verbose_name_plural = "Фильтры пользователей"
         ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["user", "is_active"], name="filter_user_active_idx"),

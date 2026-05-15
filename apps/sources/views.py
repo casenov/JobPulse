@@ -10,9 +10,7 @@ from core.permissions import IsAdminOrReadOnly
 
 class SourceViewSet(ReadOnlyModelViewSet):
     """
-    GET /api/v1/sources/        — list all active sources
-    GET /api/v1/sources/{id}/   — source detail
-    GET /api/v1/sources/{id}/logs/ — parsing logs for source
+    Управление источниками данных (активные источники, детали, логи парсинга).
     """
 
     queryset = Source.objects.filter(is_active=True).order_by("name")
